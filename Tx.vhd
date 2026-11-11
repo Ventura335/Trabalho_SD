@@ -15,7 +15,7 @@ end DivisorClock;
 architecture Behavioral of DivisorClock is
 begin
     process(clk50MHz, reset)
-        variable cnt : integer range 0 to 5208; -- Ajustado para suportar até 5208
+        variable cnt : integer range 0 to 5208;
     begin
         if (reset = '1') then
             cnt := 0;
