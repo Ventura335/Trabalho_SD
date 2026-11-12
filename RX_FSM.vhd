@@ -18,20 +18,25 @@ architecture fsm of rx_fsm is
 
   signal ps, ns : state_type;
   signal i : integer;
-  signal start_detect : std_logic_vector(1 downto 0);
-  signal start_bit : std_logic;
+  signal start_detect : std_logic_vector(1 downto 0) := "11";
+  signal start_bit : std_logic := '0';
 begin
 
 sync_proc : process (BC)
 begin
-  start_detect <= start_detect(0) & data_in;
-  start_bit <= '1' when (start_detect = "10") else '0';
-  
   if (rising_edge(BC)) then
-    if (reset = '1') then  
+    if (reset = '1') then
+      start_detect    <= "11";
+      start_bit <= '0';
       PS <= Inicio;
     else
+      start_detect <= start_detect(0) & rx_in;
       PS <= NS;
+      if (start_detect = "10") then
+        start_bit <= '1';
+      elsif (PS /= Inicio) then
+        start_bit <= '0';
+      end if;
     end if;
   end if;
 end process sync_proc;
