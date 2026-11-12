@@ -30,7 +30,7 @@ begin
       start_bit <= '0';
       PS <= Inicio;
     else
-      start_detect <= start_detect(0) & rx_in;
+      start_detect <= start_detect(0) & data_in;
       PS <= NS;
       if (start_detect = "10") then
         start_bit <= '1';
@@ -42,7 +42,8 @@ begin
 end process sync_proc;
 
 
-comb_proc : process (PS)
+
+comb_proc : process (BC, PS)
     begin
     case PS is
       when Inicio =>
@@ -61,7 +62,7 @@ comb_proc : process (PS)
         start_sample <= '1';
 
       when recebe_data =>
-        if (i < 8) then 
+        if (i < 16) then 
             ns <= recebe_data;
             i <= i + 1;
         else 
@@ -72,8 +73,6 @@ comb_proc : process (PS)
       when data_out =>
         NS <= Inicio;
         rx_ready <= '1';
-        
-
   end case;
 end process comb_proc;
 end fsm;
