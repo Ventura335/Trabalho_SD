@@ -89,3 +89,119 @@ begin
         );  
     
 end structural;
+
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+entity uart_rx_top is
+  port (
+    clk50MHz   : in std_logic;
+    reset      : in std_logic;
+    data_in    : in std_logic;
+    rx_out     : out std_logic_vector(7 downto 0);
+    rx_ready    : out std_logic
+  );
+end uart_rx_top;
+
+architecture structural of uart_rx_top is
+    signal bc_top         : std_logic;
+    signal shift_rx_top   : std_logic;
+    signal clk_16x        : std_logic;
+    signal start_sample   : std_logic;
+
+    -- Baud Clock --
+
+    component DivisorClock is
+        port ( 
+            clk50MHz : in std_logic;
+            reset    : in std_logic;
+            BC       : out std_logic
+        );
+    end component;
+
+    -- Divisor para gerador de pulso --
+
+    component DivisorClock16x is
+    port ( 
+        clk50MHz : in std_logic;
+        reset    : in std_logic;
+        clk_16x  : out std_logic
+    );
+    end component;
+
+    -- Gerador de pulso --
+
+    component sample_tick is
+    port (
+        clock         : in std_logic; 
+        reset         : in std_logic;
+        start_sample  : in std_logic;
+        ST          : out std_logic
+    );
+    end component;
+
+    -- Registrador de deslocamento --
+
+    component srl_rx is
+    port ( 
+        clock       : in std_logic;
+        reset       : in std_logic;
+        rx_in       : in std_logic;
+        shift_rx    : in std_logic; 
+        data_out_rx : out std_logic_vector(7 downto 0)
+    );
+    end component;
+
+    -- FSM do transmissor --
+
+    component rx_fsm is
+    port (
+        BC, reset, data_in : in std_logic;
+        rx_ready, start_sample : OUT std_logic
+    );
+    end component;
+
+begin 
+
+    Baud : DivisorClock
+        port map ( 
+            clk50MHz => clk50MHz,
+            reset    => reset,
+            BC       => bc_top
+        );
+
+    Div16x : DivisorClock16x
+        port map ( 
+            clk50MHz => clk50MHz,
+            reset    => reset,
+            clk_16x  => clk_16x
+        );
+    
+    Sample : sample_tick
+        port map ( 
+            clock         => clk_16x,
+            reset         => reset,
+            start_sample  => start_sample,
+            ST          => shift_rx_top
+        );
+
+    Srlrx : srl_rx
+        port map ( 
+            clock       => bc_top,
+            reset       => reset,
+            rx_in       => data_in,
+            shift_rx    => shift_rx_top,
+            data_out_rx => rx_out
+        );
+
+    fsm_rx : rx_fsm
+        port map (
+            BC        => bc_top,
+            reset     => reset,
+            data_in   => data_in,
+            rx_ready  => rx_ready,
+            start_sample  => start_sample
+        );
+    
+end structural;
