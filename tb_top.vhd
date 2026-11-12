@@ -24,6 +24,7 @@ architecture teste of tb_uart_completa is
 
 begin
 
+    -- Gerador de Clock Principal (50 MHz)
     process
     begin
         while not sim_finished loop
@@ -48,7 +49,7 @@ begin
             tx_busy   => tx_busy_sig
         );
 
-    -- Instância do Receptor (Conectando a saída do TX na entrada do RX)
+    -- Instância do Receptor (Loopback: tx_out ligado no rx)
     DUT_RX : entity work.uart_rx_top
         port map (
             clk50MHz => clk50MHz,
@@ -58,48 +59,46 @@ begin
             rx_ready => rx_ready_sig
         );
 
-    -- Processo de estímulos
+    -- Processo de Estímulos com tempos estendidos para o BC
     process
     begin
+        -- Estado inicial de Reset
         reset <= '1';
         load <= '0';
         tx_start <= '0';
         sel_in_tx <= '0';
-        data_in <= "00000000";
+        data_in <= (others => '0');
         
-        wait for 100 ns;
-        reset <= '0';
-        wait for 100 ns;
+        wait for 200 ns;
+        reset <= '0'; -- Libera o reset
+        wait for 500 ns;
 
-        -- Configura e carrega o dado no transmissor
+        -- 1º Envio de Dado ("10110101")
         data_in <= "10110101";
-        load <= '1';
-        wait for CLK_PERIOD * 2;
-        
-        load <= '0';
-        wait for CLK_PERIOD * 2;
+        load <= '1';          
+        wait for 2 ms;        -- Tempo longo para o BC lento detetar o load
+        load <= '0';          
+        wait for 2 ms;
 
-        -- Inicia a transmissão
-        tx_start <= '1';
-        wait for CLK_PERIOD * 2;
+        tx_start <= '1';      
+        wait for 2 ms;        -- Tempo longo para o BC lento detetar o start
         tx_start <= '0';
 
-        -- Aguarda o tempo necessário para a transmissão e recepção completa do byte
-        wait for 3 ms;
+        -- Aguarda a transmissão completa do byte
+        wait for 4 ms;
 
-        -- Envia um segundo byte para testar novamente
+        -- 2º Envio de Dado ("11001100")
         data_in <= "11001100";
         load <= '1';
-        wait for CLK_PERIOD * 2;
-        
+        wait for 2 ms;
         load <= '0';
-        wait for CLK_PERIOD * 2;
+        wait for 2 ms;
 
         tx_start <= '1';
-        wait for CLK_PERIOD * 2;
+        wait for 2 ms;
         tx_start <= '0';
 
-        wait for 3 ms;
+        wait for 4 ms;
 
         sim_finished <= true;
         wait;

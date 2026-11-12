@@ -20,8 +20,6 @@ architecture structural of uart_tx_top is
     signal shift_tx_top   : std_logic;
     signal data_fsm_top   : std_logic_vector(7 downto 0);
 
-    -- Baud Clock --
-
     component DivisorClock is
         port ( 
             clk50MHz : in std_logic;
@@ -29,8 +27,6 @@ architecture structural of uart_tx_top is
             BC       : out std_logic
         );
     end component;
-
-    -- Registrador de deslocamento --
 
     component srl_tx is
         port ( 
@@ -40,11 +36,9 @@ architecture structural of uart_tx_top is
             shift_tx      : in std_logic;
             data_in       : in std_logic_vector(7 downto 0);
             tx_out        : out std_logic;
-            carac_load_tx : out std_logic_vector(7 downto 0)
+            carac_load_tx : out std_logic_vector(9 downto 0)
         );
     end component;
-
-    -- FSM do transmissor --
 
     component tx_fsm is
         port (
@@ -100,7 +94,7 @@ entity uart_rx_top is
     reset      : in std_logic;
     data_in    : in std_logic;
     rx_out     : out std_logic_vector(7 downto 0);
-    rx_ready    : out std_logic
+    rx_ready   : out std_logic
   );
 end uart_rx_top;
 
@@ -110,8 +104,6 @@ architecture structural of uart_rx_top is
     signal clk_16x        : std_logic;
     signal start_sample   : std_logic;
 
-    -- Baud Clock --
-
     component DivisorClock is
         port ( 
             clk50MHz : in std_logic;
@@ -119,8 +111,6 @@ architecture structural of uart_rx_top is
             BC       : out std_logic
         );
     end component;
-
-    -- Divisor para gerador de pulso --
 
     component DivisorClock16x is
     port ( 
@@ -130,8 +120,6 @@ architecture structural of uart_rx_top is
     );
     end component;
 
-    -- Gerador de pulso --
-
     component sample_tick is
     port (
         clock         : in std_logic; 
@@ -140,8 +128,6 @@ architecture structural of uart_rx_top is
         ST          : out std_logic
     );
     end component;
-
-    -- Registrador de deslocamento --
 
     component srl_rx is
     port ( 
@@ -153,12 +139,10 @@ architecture structural of uart_rx_top is
     );
     end component;
 
-    -- FSM do transmissor --
-
     component rx_fsm is
     port (
         BC, reset, data_in : in std_logic;
-        rx_ready, start_sample : OUT std_logic
+        rx_ready, start_sample : out std_logic
     );
     end component;
 
@@ -186,22 +170,23 @@ begin
             ST          => shift_rx_top
         );
 
+    -- CORREÇÃO: O registrador do receptor deve ser deslocado pelo pulso de amostragem (shift_rx_top)
     Srlrx : srl_rx
         port map ( 
-            clock       => bc_top,
+            clock       => clk_16x,       -- Usa o clock de alta frequência 16x ou o tick estrutural
             reset       => reset,
             rx_in       => data_in,
-            shift_rx    => shift_rx_top,
+            shift_rx    => shift_rx_top,  -- Pulso de habilitação/deslocamento
             data_out_rx => rx_out
         );
 
     fsm_rx : rx_fsm
         port map (
-            BC        => bc_top,
-            reset     => reset,
-            data_in   => data_in,
-            rx_ready  => rx_ready,
-            start_sample  => start_sample
+            BC          => bc_top,
+            reset       => reset,
+            data_in     => data_in,
+            rx_ready    => rx_ready,
+            start_sample => start_sample
         );
     
 end structural;

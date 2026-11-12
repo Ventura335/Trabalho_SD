@@ -46,12 +46,12 @@ port (
     shift_tx      : in std_logic;
     data_in       : in std_logic_vector(7 downto 0);
     tx_out        : out std_logic;
-    carac_load_tx : out std_logic_vector(7 downto 0)
+    carac_load_tx : out std_logic_vector(9 downto 0)
 );
 end srl_tx;
 
 architecture comportamental of srl_tx is
-    signal shift_register : std_logic_vector(7 downto 0);
+    signal shift_register : std_logic_vector(9 downto 0);
 begin
     process(clock, reset)
     begin
@@ -59,7 +59,7 @@ begin
             shift_register <= (others => '0');
         elsif (rising_edge(clock)) then
             if (load_tx = '1') then
-                shift_register <= data_in;
+                shift_register <= '1' & data_in & '0';
             elsif (shift_tx = '1') then
                 shift_register <= shift_register srl 1;
             end if;
