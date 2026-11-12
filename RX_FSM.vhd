@@ -32,6 +32,9 @@ begin
     else
       start_detect <= start_detect(0) & data_in;
       PS <= NS;
+      if (NS = recebe_data) then
+        i <= i + 1;
+      end if;
       if (start_detect = "10") then
         start_bit <= '1';
       elsif (PS /= Inicio) then
@@ -43,7 +46,7 @@ end process sync_proc;
 
 
 
-comb_proc : process (BC, PS)
+comb_proc : process (start_bit, PS)
     begin
     case PS is
       when Inicio =>
@@ -62,9 +65,8 @@ comb_proc : process (BC, PS)
         start_sample <= '1';
 
       when recebe_data =>
-        if (i < 16) then 
+        if (i < 8) then 
             ns <= recebe_data;
-            i <= i + 1;
         else 
             ns <= data_out;
             i <= 0;
