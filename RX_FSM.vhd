@@ -26,12 +26,15 @@ sync_proc : process (BC)
 begin
   if (rising_edge(BC)) then
     if (reset = '1') then
-      start_detect    <= "11";
+      start_detect <= "11";
       start_bit <= '0';
       PS <= Inicio;
     else
       start_detect <= start_detect(0) & data_in;
       PS <= NS;
+      if (start_bit <= '1') then
+        start_sample <= '1';
+      end if;
       if (NS = recebe_data) then
         i <= i + 1;
       end if;
@@ -62,7 +65,7 @@ comb_proc : process (start_bit, PS)
         ns <= recebe_data;
         i <= 0;
         rx_ready <= '0';
-        start_sample <= '1';
+        
 
       when recebe_data =>
         if (i < 8) then 
