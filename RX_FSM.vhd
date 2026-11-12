@@ -32,6 +32,9 @@ begin
     else
       start_detect <= start_detect(0) & data_in;
       PS <= NS;
+      if (start_bit <= '1') then
+        start_sample <= '1';
+      end if;
       if (NS = recebe_data) then
         i <= i + 1;
       end if;
@@ -54,14 +57,12 @@ comb_proc : process (start_bit, PS)
           Ns <= Inicio;
         elsif (start_bit = '1') then
           Ns <= shift_rx;
-          start_sample <= '1';
         else 
           Ns <= Inicio;
         end if;
         
       when shift_rx =>
         ns <= recebe_data;
-        i <= 0;
         rx_ready <= '0';
         
 
@@ -70,7 +71,6 @@ comb_proc : process (start_bit, PS)
             ns <= recebe_data;
         else 
             ns <= data_out;
-            i <= 0;
             start_sample <= '0';
         end if;
       when data_out =>
