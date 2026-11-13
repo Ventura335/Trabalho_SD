@@ -34,7 +34,7 @@ begin
       PS <= NS;
       if (NS = recebe_data) then
         i <= i + 1;
-      elsif (NS = data_out) then
+      elsif (PS = Inicio) then
         i <= 0;
       end if;
       if (start_detect = "10") then
