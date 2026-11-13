@@ -14,10 +14,10 @@ architecture fsm of rx_fsm is
 
 --------------------------------------------------------------
 -------------------------------------------------------------------
-  type state_type is (Inicio, shift_rx, recebe_data, data_out, wait);
+  type state_type is (Inicio, shift_rx, recebe_data, data_out, Espera);
 
   signal ps, ns : state_type;
-  signal i : integer;
+  signal i : integer := 0;
   signal start_detect : std_logic_vector(1 downto 0) := "11";
   signal start_bit : std_logic := '0';
 begin
@@ -72,9 +72,9 @@ comb_proc : process (start_bit, PS)
             start_sample <= '0';
         end if;
       when data_out =>
-        NS <= wait;
+        NS <= Espera;
         rx_ready <= '1';
-      when wait =>
+      when Espera =>  
         NS <= Inicio;
   end case;
 end process comb_proc;

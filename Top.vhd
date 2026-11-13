@@ -171,18 +171,17 @@ begin
             ST          => shift_rx_top
         );
 
-    -- CORREÇÃO: O registrador do receptor deve ser deslocado pelo pulso de amostragem (shift_rx_top)
     Srlrx : srl_rx
         port map ( 
-            clock       => clk_16x,       -- Usa o clock de alta frequência 16x ou o tick estrutural
+            clock       => clk_16x,       
             reset       => reset,
             rx_in       => data_in,
-            shift_rx    => shift_rx_top,  -- Pulso de habilitação/deslocamento
+            shift_rx    => shift_rx_top,  
             rx_ready    => rx_ready,
             data_out_rx => rx_out
         );
-
-    fsm_rx : rx_fsm
+        
+        fsm_rx : rx_fsm
         port map (
             BC          => bc_top,
             reset       => reset,
@@ -190,5 +189,5 @@ begin
             rx_ready    => rx_ready,
             start_sample => start_sample
         );
-    
+
 end structural;
