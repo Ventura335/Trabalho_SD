@@ -136,8 +136,9 @@ begin
                 shift_register <= rx_in & shift_register(7 downto 1);
             end if;
         end if;
-    end process;
-    if (rx_ready = '1') then
+        if (rx_ready = '1') then
         data_out_rx <= shift_register;
     end if;
+    end process;
+    
 end comportamental;
