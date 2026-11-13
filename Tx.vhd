@@ -59,7 +59,7 @@ begin
             shift_register <= (others => '0');
         elsif (rising_edge(clock)) then
             if (load_tx = '1') then
-                shift_register <= '1' & data_in & '0';
+                shift_register <= data_in & '0' & '1';
             elsif (shift_tx = '1') then
                 shift_register <= shift_register srl 1;
             end if;

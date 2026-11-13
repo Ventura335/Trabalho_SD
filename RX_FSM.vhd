@@ -39,6 +39,7 @@ begin
       end if;
       if (start_detect = "10") then
         start_bit <= '1';
+        
       elsif (PS /= Inicio) then
         start_bit <= '0';
       end if;
@@ -55,19 +56,18 @@ comb_proc : process (start_bit, PS, BC)
         start_sample <= '1';
         if (Reset = '1') then
           Ns <= Inicio;
+          rx_ready <= '0';
         elsif (start_bit = '1') then
           Ns <= shift_rx;
+          rx_ready <= '0';
         else 
           Ns <= Inicio;
         end if;
         
       when shift_rx =>
         ns <= recebe_data;
-        rx_ready <= '0';
-        
-
       when recebe_data =>
-        if (i < 8) then 
+        if (i < 6) then 
             ns <= recebe_data;
         else 
             ns <= data_out;
