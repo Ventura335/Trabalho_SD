@@ -56,10 +56,8 @@ comb_proc : process (start_bit, PS, BC)
         start_sample <= '1';
         if (Reset = '1') then
           Ns <= Inicio;
-          rx_ready <= '0';
         elsif (start_bit = '1') then
           Ns <= shift_rx;
-          rx_ready <= '0';
         else 
           Ns <= Inicio;
         end if;
@@ -78,6 +76,7 @@ comb_proc : process (start_bit, PS, BC)
         rx_ready <= '1';
       when Espera =>  
         NS <= Inicio;
+        rx_ready <= '0';
   end case;
 end process comb_proc;
 end fsm;
