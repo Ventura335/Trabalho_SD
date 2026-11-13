@@ -46,7 +46,7 @@ end process sync_proc;
 
 
 
-comb_proc : process (start_bit, PS)
+comb_proc : process (start_bit, PS, BC)
     begin
     case PS is
       when Inicio =>
