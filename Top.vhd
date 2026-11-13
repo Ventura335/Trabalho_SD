@@ -134,7 +134,8 @@ architecture structural of uart_rx_top is
         clock       : in std_logic;
         reset       : in std_logic;
         rx_in       : in std_logic;
-        shift_rx    : in std_logic; 
+        shift_rx    : in std_logic;
+        rx_ready    : in std_logic;
         data_out_rx : out std_logic_vector(7 downto 0)
     );
     end component;
@@ -177,6 +178,7 @@ begin
             reset       => reset,
             rx_in       => data_in,
             shift_rx    => shift_rx_top,  -- Pulso de habilitação/deslocamento
+            rx_ready    => rx_ready,
             data_out_rx => rx_out
         );
 

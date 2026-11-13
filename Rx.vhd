@@ -118,7 +118,8 @@ port (
     clock       : in std_logic;
     reset       : in std_logic;
     rx_in       : in std_logic;
-    shift_rx    : in std_logic; 
+    shift_rx    : in std_logic;
+    rx_ready    : in std_logic; 
     data_out_rx : out std_logic_vector(7 downto 0)
 );
 end srl_rx;
@@ -136,6 +137,7 @@ begin
             end if;
         end if;
     end process;
-    
-    data_out_rx <= shift_register;
+    if (rx_ready = '1') then
+        data_out_rx <= shift_register;
+    end if;
 end comportamental;
